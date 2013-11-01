@@ -24,20 +24,36 @@ namespace Calculator
             calcResultLabel.Location = new Point(503, 51);
         }
 
+        private bool PrepareInputString(string n)
+        {
+            if (n == "." && m_InputString.Contains("."))
+                return false;
+            if (n == m_InputString && n == "0")
+                return false;
+            if (m_InputString == "0" && n != "0")
+                m_InputString = "";
+            if (n == "." && m_InputString == "")
+                m_InputString = "0";
+            return true;
+        }
+
         private void AddToInputString(string n)
         {
+            if (!PrepareInputString(n))
+                return;
             m_InputString += n;
             calcResultLabel.Text = m_InputString;
             int offsetLabelBy = (m_InputString.Length - 1) * 14;
             calcResultLabel.Location = new Point(503 - offsetLabelBy, 51);
         }
 
-        private void buttonZero_Click(object sender, EventArgs e)
+        private void buttonNumber_Click(object sender, EventArgs e)
         {
-            AddToInputString("0");
+            Button inputLabel = (Button)sender;
+            AddToInputString(inputLabel.Text);
         }
 
-        private void button8_Click(object sender, EventArgs e)
+        private void buttonClear_Click(object sender, EventArgs e)
         {
             ResetInputString();
         }
