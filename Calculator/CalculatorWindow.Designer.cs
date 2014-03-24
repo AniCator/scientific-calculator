@@ -58,6 +58,7 @@
             this.buttonPeriod = new System.Windows.Forms.Button();
             this.button29 = new System.Windows.Forms.Button();
             this.button30 = new System.Windows.Forms.Button();
+            this.debugBox = new System.Windows.Forms.TextBox();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -164,6 +165,7 @@
             this.button9.TabIndex = 7;
             this.button9.Text = "+/-";
             this.button9.UseVisualStyleBackColor = true;
+            this.button9.Click += new System.EventHandler(this.buttonParseAndAddCalculation_Click);
             // 
             // button10
             // 
@@ -173,6 +175,7 @@
             this.button10.TabIndex = 6;
             this.button10.Text = "sqrt";
             this.button10.UseVisualStyleBackColor = true;
+            this.button10.Click += new System.EventHandler(this.buttonParseAndAddCalculation_Click);
             // 
             // buttonSeven
             // 
@@ -212,6 +215,7 @@
             this.button14.TabIndex = 12;
             this.button14.Text = "/";
             this.button14.UseVisualStyleBackColor = true;
+            this.button14.Click += new System.EventHandler(this.buttonParseAndAddCalculation_Click);
             // 
             // button15
             // 
@@ -221,6 +225,7 @@
             this.button15.TabIndex = 11;
             this.button15.Text = "%";
             this.button15.UseVisualStyleBackColor = true;
+            this.button15.Click += new System.EventHandler(this.buttonParseAndAddCalculation_Click);
             // 
             // buttonFour
             // 
@@ -260,6 +265,7 @@
             this.button19.TabIndex = 17;
             this.button19.Text = "*";
             this.button19.UseVisualStyleBackColor = true;
+            this.button19.Click += new System.EventHandler(this.buttonParseAndAddCalculation_Click);
             // 
             // button20
             // 
@@ -269,6 +275,7 @@
             this.button20.TabIndex = 16;
             this.button20.Text = "1/x";
             this.button20.UseVisualStyleBackColor = true;
+            this.button20.Click += new System.EventHandler(this.buttonParseAndAddCalculation_Click);
             // 
             // buttonOne
             // 
@@ -308,6 +315,7 @@
             this.button24.TabIndex = 22;
             this.button24.Text = "-";
             this.button24.UseVisualStyleBackColor = true;
+            this.button24.Click += new System.EventHandler(this.buttonParseAndAddCalculation_Click);
             // 
             // buttonZero
             // 
@@ -337,6 +345,7 @@
             this.button29.TabIndex = 27;
             this.button29.Text = "+";
             this.button29.UseVisualStyleBackColor = true;
+            this.button29.Click += new System.EventHandler(this.buttonParseAndAddCalculation_Click);
             // 
             // button30
             // 
@@ -346,12 +355,22 @@
             this.button30.TabIndex = 26;
             this.button30.Text = "=";
             this.button30.UseVisualStyleBackColor = true;
+            this.button30.Click += new System.EventHandler(this.buttonParseAndAddCalculation_Click);
+            // 
+            // debugBox
+            // 
+            this.debugBox.Location = new System.Drawing.Point(13, 349);
+            this.debugBox.Multiline = true;
+            this.debugBox.Name = "debugBox";
+            this.debugBox.Size = new System.Drawing.Size(532, 92);
+            this.debugBox.TabIndex = 31;
             // 
             // CalculatorWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(560, 336);
+            this.ClientSize = new System.Drawing.Size(560, 453);
+            this.Controls.Add(this.debugBox);
             this.Controls.Add(this.buttonZero);
             this.Controls.Add(this.buttonPeriod);
             this.Controls.Add(this.button29);
@@ -387,6 +406,7 @@
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -422,6 +442,7 @@
         private System.Windows.Forms.Button buttonPeriod;
         private System.Windows.Forms.Button button29;
         private System.Windows.Forms.Button button30;
+        private System.Windows.Forms.TextBox debugBox;
     }
 }
 
