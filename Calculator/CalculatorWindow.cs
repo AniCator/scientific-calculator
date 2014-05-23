@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -6,19 +7,100 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.IO;
 
 namespace Calculator
 {
+    struct OpPrec
+    {
+        public string optoken;
+        public string opprec;
+        public bool opassoc;
+    }
+
     public partial class CalculatorWindow : Form
     {
+        List<OpPrec> operatorInfo = new List<OpPrec>();
+
         private string m_InputString = "0";
         private Stack<string> m_PolishStack = new Stack<string>();
-        private bool resultStringActive = false;
+        bool resultStringActive = false;
+
+        private string m_InfixString = "";
 
         public CalculatorWindow()
         {
+            AddOperationToken("+", "2", false);
+            AddOperationToken("-", "2", false);
+            AddOperationToken("/", "3", false);
+            AddOperationToken("*", "3", false);
+            AddOperationToken("^", "4", true);
+
             InitializeComponent();
         }
+
+        private void AddOperationToken(string optoken_in, string opprec_in, bool opassoc_in)
+        {
+            OpPrec data;
+            data.optoken = optoken_in;
+            data.opprec = opprec_in;
+            data.opassoc = opassoc_in;
+
+            operatorInfo.Add(data);
+        }
+
+        private bool IsOperator(string token)
+        {
+            foreach (OpPrec op in operatorInfo)
+            {
+                if (op.optoken == token)
+                    return true;
+            }
+            return false;
+        }
+
+        private bool IsAssociative(String token, bool type)
+        {
+            if (!IsOperator(token))
+            {
+                throw new ArgumentException("Invalid token: " + token);
+            }
+            foreach (OpPrec op in operatorInfo)
+            {
+                if (op.optoken == token)
+                {
+                    if (op.opassoc == type)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        private int ComparePrecedence(String token1, String token2) {
+		    if (!IsOperator(token1) || !IsOperator(token2))
+            {
+			    throw new ArgumentException("Invalid tokens: " + token1
+					    + " " + token2);
+		    }
+
+            int prec1 = 0;
+            int prec2 = 0;
+            foreach (OpPrec op in operatorInfo)
+            {
+                if (op.optoken == token1)
+                {
+                    prec1 = int.Parse(op.opprec);
+                }
+                if (op.optoken == token2)
+                {
+                    prec2 = int.Parse(op.opprec);
+                }
+            }
+
+            return prec1 - prec2;
+	    }
 
         private void UpdateDebugPoland()
         {
@@ -34,6 +116,7 @@ namespace Calculator
         {
             if ( strbit == "" || strbit == "=" ) return;
 
+            m_InfixString += strbit + " ";
             m_PolishStack.Push(strbit);
         }
 
@@ -53,21 +136,22 @@ namespace Calculator
         {
             if (numberString == "") return;
 
+            m_InfixString += numberString + " ";
             m_PolishStack.Push(numberString);
             numberString = "";
         }
 
         private void BuildCalculationString()
         {
-            string calcString = "";
-            List<string> revString = m_PolishStack.Reverse().ToList();
-
-            foreach (string str in revString)
+            string polishString = "";
+            foreach (string str in m_PolishStack)
             {
-                calcString += str;
+                polishString += str + " ";
             }
 
-            label2.Text = calcString;
+            polishString = polishString.Substring(0, polishString.Length - 1);
+
+            calculationLabel.Text = ConvertRPNToInfix(polishString.Split(' '));
         }
 
         private void CalculateAnswer()
@@ -91,10 +175,10 @@ namespace Calculator
             {
                 calcResultLabel.Text = "0";
                 ClearCalculations();
-                MessageBox.Show("Kut!");
+                MessageBox.Show("Probleempje!");
             }
             UpdateResultOffset(calcResultLabel.Text, calcResultLabel);
-            UpdateResultOffset(label2.Text, label2);
+            UpdateResultOffset(calculationLabel.Text, calculationLabel);
             Console.WriteLine(calcResultLabel.Text);
         }
 
@@ -103,13 +187,14 @@ namespace Calculator
             debugBox.Clear();
             ClearPoland();
             sHeldCalc = "";
+            m_InfixString = "";
         }
 
         private void ResetInputString()
         {
             m_InputString = "0";
-            label2.Text = "0";
-            label2.Location = new Point(503, label2.Location.Y);
+            calculationLabel.Text = "0";
+            calculationLabel.Location = new Point(503, calculationLabel.Location.Y);
             calcResultLabel.Text = m_InputString;
             calcResultLabel.Location = new Point(503, calcResultLabel.Location.Y);
         }
@@ -122,6 +207,12 @@ namespace Calculator
 
         private void buttonNumber_Click(object sender, EventArgs e)
         {
+            if (bFinishedCalculation)
+            {
+                ClearCalculations();
+                bFinishedCalculation = false;
+            }
+
             Button inputButton = (Button)sender;
             AddToPolishStringNumber(inputButton.Text);
             bCopyCalc = true;
@@ -134,6 +225,7 @@ namespace Calculator
         }
 
         bool bCopyCalc = false;
+        bool bFinishedCalculation = false;
         string sHeldCalc = "";
         private void buttonParseAndAddCalculation_Click(object sender, EventArgs e)
         {
@@ -149,9 +241,11 @@ namespace Calculator
             {
                 AddToPolishString(sHeldCalc);
                 sHeldCalc = "";
+                bFinishedCalculation = true;
             }
             else if (sHeldCalc == "")
             {
+                bFinishedCalculation = false;
                 if (polishString != sHeldCalc)
                 {
                     sHeldCalc = polishString;
@@ -159,6 +253,7 @@ namespace Calculator
             }
             else
             {
+                bFinishedCalculation = false;
                 if (bCopyCalc)
                 {
                     AddToPolishString(sHeldCalc);
@@ -175,6 +270,102 @@ namespace Calculator
 
             resultStringActive = true;
             CalculateAnswer();
+        }
+
+        private string ConvertInfixToRPN(string[] inputTokens)
+        {
+            List<string> output = new List<string>();
+            Stack<string> stack = new Stack<string>();
+
+            foreach (string token in inputTokens)
+            {
+                if (!IsOperator(token)) // If token is operator
+                {
+                    while (stack.Count != 0 && IsOperator(stack.Peek())) // check stack not empty and top item in stack is operator
+                    {
+                        if ((IsAssociative(token, false) && ComparePrecedence(
+							token, stack.Peek()) <= 0)
+							|| (IsAssociative(token, true) && ComparePrecedence(
+									token, stack.Peek()) < 0)) // check which operator should go in first
+                        {
+                            output.Add(stack.Pop());
+                            continue;
+                        }
+                        break;
+                    }
+                    stack.Push(token); // push operator to the stack
+                }
+                else if (token.Equals("("))
+                {
+                    stack.Push(token); // push it directly
+                }
+                else if (token.Equals(")"))
+                {
+                    while (stack.Count != 0 && !stack.Peek().Equals("(")) // while stack isn't empty and next item in the stack isn't a (
+                    {
+					    output.Add(stack.Pop()); // pop it and add it to the output list
+                    }
+                    stack.Pop(); // pop whatever
+                }
+                else
+                {
+                    output.Add(token); // a number, just add it
+                }
+            }
+
+            while (stack.Count != 0) // add items from the stack to the output list until it is empty
+            {
+                output.Add(stack.Pop());
+            }
+
+            // Construct output string
+            string[] outputStringArray = new string[output.Count];
+            outputStringArray = output.ToArray();
+
+            string outputString = "";
+            foreach (string str in outputStringArray)
+            {
+                outputString += str + " ";
+            }
+
+            return outputString;
+        }
+
+        private string ConvertRPNToInfix(string[] inputTokens) // TODO: Still requires a bunch of work
+        {
+            List<string> output = new List<string>();
+            Stack<string> stack = new Stack<string>();
+
+            foreach (string token in inputTokens)
+            {
+                if (IsOperator(token))
+                {
+                    stack.Push(token);
+                    continue;
+                }
+                else
+                {
+                    output.Add(token);
+                }
+                
+                while (stack.Count != 0)
+                {
+                    output.Add(stack.Pop());
+                }
+            }
+
+            // Construct output string
+            output.Reverse();
+            string[] outputStringArray = new string[output.Count];
+            outputStringArray = output.ToArray();
+
+            string outputString = "";
+            foreach (string str in outputStringArray)
+            {
+                outputString += str + " ";
+            }
+
+            return outputString;
         }
     }
 }

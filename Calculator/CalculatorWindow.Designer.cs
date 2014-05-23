@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.panel1 = new System.Windows.Forms.Panel();
-            this.label2 = new System.Windows.Forms.Label();
+            this.calculationLabel = new System.Windows.Forms.Label();
             this.calcResultLabel = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
@@ -66,7 +66,7 @@
             // panel1
             // 
             this.panel1.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
-            this.panel1.Controls.Add(this.label2);
+            this.panel1.Controls.Add(this.calculationLabel);
             this.panel1.Controls.Add(this.calcResultLabel);
             this.panel1.Location = new System.Drawing.Point(13, 13);
             this.panel1.Name = "panel1";
@@ -75,15 +75,15 @@
             // 
             // label2
             // 
-            this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Calibri", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
-            this.label2.Location = new System.Drawing.Point(503, 3);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(29, 33);
-            this.label2.TabIndex = 1;
-            this.label2.Text = "0";
+            this.calculationLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.calculationLabel.AutoSize = true;
+            this.calculationLabel.Font = new System.Drawing.Font("Calibri", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.calculationLabel.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.calculationLabel.Location = new System.Drawing.Point(503, 3);
+            this.calculationLabel.Name = "label2";
+            this.calculationLabel.Size = new System.Drawing.Size(29, 33);
+            this.calculationLabel.TabIndex = 1;
+            this.calculationLabel.Text = "0";
             // 
             // calcResultLabel
             // 
@@ -458,7 +458,7 @@
         private System.Windows.Forms.Button button29;
         private System.Windows.Forms.Button button30;
         private System.Windows.Forms.TextBox debugBox;
-        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label calculationLabel;
     }
 }
 
