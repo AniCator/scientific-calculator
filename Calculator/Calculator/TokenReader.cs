@@ -15,14 +15,21 @@ namespace Calculator
         private ICalculationExpression ReadNextToken(List<string> tokenList)
         {
             double i = 0.0;
-            if (double.TryParse(tokenList.First(), out i))
+            try
             {
-                tokenList.RemoveAt(0);
-                return new NumberExpression(i);
+                if (double.TryParse(tokenList.First(), out i))
+                {
+                    tokenList.RemoveAt(0);
+                    return new NumberExpression(i);
+                }
+                else
+                {
+                    return ReadNonTerminal(tokenList);
+                }
             }
-            else
+            catch (InvalidOperationException ex)
             {
-                return ReadNonTerminal(tokenList);
+                return new NumberExpression(0);
             }
         }
 

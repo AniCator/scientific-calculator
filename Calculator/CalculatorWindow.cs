@@ -39,7 +39,7 @@ namespace Calculator
 
         private void ClearPoland()
         {
-            ClearPolandNumber();
+            PushNumberString();
             m_PolishStack.Clear();
         }
 
@@ -49,7 +49,7 @@ namespace Calculator
             numberString += number;
         }
 
-        private void ClearPolandNumber()
+        private void PushNumberString()
         {
             if (numberString == "") return;
 
@@ -76,7 +76,9 @@ namespace Calculator
 
             TokenReader reader = new TokenReader();
 
-            ICalculationExpression resultExpression = reader.ReadToken(m_PolishStack.ToList());
+            List<string> polishTokenList = m_PolishStack.ToList();
+
+            ICalculationExpression resultExpression = reader.ReadToken(polishTokenList);
 
             ResetInputString();
             BuildCalculationString();
@@ -93,13 +95,14 @@ namespace Calculator
             }
             UpdateResultOffset(calcResultLabel.Text, calcResultLabel);
             UpdateResultOffset(label2.Text, label2);
+            Console.WriteLine(calcResultLabel.Text);
         }
 
         private void ClearCalculations()
         {
             debugBox.Clear();
             ClearPoland();
-            heldCalc = "";
+            sHeldCalc = "";
         }
 
         private void ResetInputString()
@@ -121,6 +124,7 @@ namespace Calculator
         {
             Button inputButton = (Button)sender;
             AddToPolishStringNumber(inputButton.Text);
+            bCopyCalc = true;
         }
 
         private void buttonClear_Click(object sender, EventArgs e)
@@ -129,7 +133,8 @@ namespace Calculator
             ClearCalculations();
         }
 
-        string heldCalc = "";
+        bool bCopyCalc = false;
+        string sHeldCalc = "";
         private void buttonParseAndAddCalculation_Click(object sender, EventArgs e)
         {
             ResetInputString(); // Reset the input string again
@@ -137,23 +142,33 @@ namespace Calculator
             Button inputButton = (Button)sender;
 
             string polishString = inputButton.Text;
-            ClearPolandNumber();
+            PushNumberString();
 
-            if (heldCalc == "")
+            // Add held calculation symbol if user wants to finish calculation
+            if (inputButton.Text == "=")
             {
-                if (polishString != heldCalc)
-                    heldCalc = polishString;
+                AddToPolishString(sHeldCalc);
+                sHeldCalc = "";
+            }
+            else if (sHeldCalc == "")
+            {
+                if (polishString != sHeldCalc)
+                {
+                    sHeldCalc = polishString;
+                }
             }
             else
             {
-                AddToPolishString(heldCalc);
-                heldCalc = "";
-            }
-
-            if (inputButton.Text == "=")
-            {
-                AddToPolishString(heldCalc);
-                heldCalc = "";
+                if (bCopyCalc)
+                {
+                    AddToPolishString(sHeldCalc);
+                    sHeldCalc = polishString;
+                    bCopyCalc = false;
+                }
+                else
+                {
+                    sHeldCalc = "";
+                }
             }
 
             UpdateDebugPoland();
