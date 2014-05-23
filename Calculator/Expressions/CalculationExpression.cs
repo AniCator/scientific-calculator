@@ -12,11 +12,14 @@ namespace Calculator
         Multiply
     }
 
-    interface ICalculation
+    struct CalcOp
     {
-        CalculationEnum GetCalculationType();
-        string GetDataString();
-        void SetDataString(string data);
-        double Operate(string other);
+        string  op;
+        int     no;
+    }
+
+    interface ICalculationExpression
+    {
+        double Interpret();
     }
 }

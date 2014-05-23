@@ -61,16 +61,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Calculation.cs" />
-    <Compile Include="CalculationAdd.cs" />
-    <Compile Include="CalculationMultiply.cs" />
+    <Compile Include="Calculator\TokenReader.cs" />
+    <Compile Include="Expressions\CalculationExpression.cs" />
     <Compile Include="CalculatorWindow.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="CalculatorWindow.Designer.cs">
       <DependentUpon>CalculatorWindow.cs</DependentUpon>
     </Compile>
-    <Compile Include="Number.cs" />
+    <Compile Include="Expressions\Expressions.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="CalculatorWindow.resx">

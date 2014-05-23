@@ -11,8 +11,8 @@ namespace Calculator
 {
     public partial class CalculatorWindow : Form
     {
-        private List<ICalculation> calculations = new List<ICalculation>();
         private string m_InputString = "0";
+        private Stack<string> m_PolishStack = new Stack<string>();
         private bool resultStringActive = false;
 
         public CalculatorWindow()
@@ -20,93 +20,107 @@ namespace Calculator
             InitializeComponent();
         }
 
+        private void UpdateDebugPoland()
+        {
+            string polishString = "";
+            foreach (string str in m_PolishStack)
+            {
+                polishString += str + " ";
+            }
+            debugBox.Text = polishString;
+        }
+
+        private void AddToPolishString(string strbit)
+        {
+            if ( strbit == "" || strbit == "=" ) return;
+
+            m_PolishStack.Push(strbit);
+        }
+
+        private void ClearPoland()
+        {
+            ClearPolandNumber();
+            m_PolishStack.Clear();
+        }
+
+        string numberString = "";
+        private void AddToPolishStringNumber(string number)
+        {
+            numberString += number;
+        }
+
+        private void ClearPolandNumber()
+        {
+            if (numberString == "") return;
+
+            m_PolishStack.Push(numberString);
+            numberString = "";
+        }
+
+        private void BuildCalculationString()
+        {
+            string calcString = "";
+            List<string> revString = m_PolishStack.Reverse().ToList();
+
+            foreach (string str in revString)
+            {
+                calcString += str;
+            }
+
+            label2.Text = calcString;
+        }
+
         private void CalculateAnswer()
         {
-            double result = 0;
-            string lastString = "0";
-            string debugString = "";
-            for(int i=0;i<calculations.Count;i++)
-            {
-                ICalculation calc = calculations[i];
+            if (m_PolishStack.Count <= 1) return;
 
-                if (calc.GetCalculationType() == CalculationEnum.Number)
-                {
-                    debugString += calc.GetDataString() + Environment.NewLine;
-                }
-                if (calc.GetCalculationType() == CalculationEnum.Add)
-                {
-                    debugString += "+" + Environment.NewLine;
-                }
-                if (calc.GetCalculationType() == CalculationEnum.Multiply)
-                {
-                    debugString += "*" + Environment.NewLine;
-                }
+            TokenReader reader = new TokenReader();
 
-                result += calc.Operate(lastString);
-                lastString = calc.GetDataString();
-            }
-            debugBox.Text = debugString;
+            ICalculationExpression resultExpression = reader.ReadToken(m_PolishStack.ToList());
+
             ResetInputString();
-            calcResultLabel.Text = result.ToString();
-            UpdateResultOffset(result.ToString());
+            BuildCalculationString();
+
+            if (resultExpression != null)
+            {
+                calcResultLabel.Text = resultExpression.Interpret().ToString();
+            }
+            else
+            {
+                calcResultLabel.Text = "0";
+                ClearCalculations();
+                MessageBox.Show("Kut!");
+            }
+            UpdateResultOffset(calcResultLabel.Text, calcResultLabel);
+            UpdateResultOffset(label2.Text, label2);
         }
 
         private void ClearCalculations()
         {
-            calculations.Clear();
             debugBox.Clear();
+            ClearPoland();
+            heldCalc = "";
         }
 
         private void ResetInputString()
         {
             m_InputString = "0";
+            label2.Text = "0";
+            label2.Location = new Point(503, label2.Location.Y);
             calcResultLabel.Text = m_InputString;
-            calcResultLabel.Location = new Point(503, 51);
+            calcResultLabel.Location = new Point(503, calcResultLabel.Location.Y);
         }
 
-        private bool PrepareInputString(string n)
-        {
-            if (resultStringActive)
-            {
-                resultStringActive = false;
-                ResetInputString();
-            }
-            if (n == "." && m_InputString.Contains("."))
-                return false;
-            if (n == m_InputString && n == "0")
-                return false;
-            if (m_InputString == "0" && n != "0")
-                m_InputString = "";
-            if (n == "." && m_InputString == "")
-                m_InputString = "0";
-            return true;
-        }
-
-        private void AddToInputString(string n)
-        {
-            if (!PrepareInputString(n))
-                return;
-            m_InputString += n;
-            calcResultLabel.Text = m_InputString;
-            UpdateResultOffset();
-        }
-
-        private void UpdateResultOffset()
-        {
-            int offsetLabelBy = (m_InputString.Length - 1) * 14;
-            calcResultLabel.Location = new Point(503 - offsetLabelBy, 51);
-        }
-
-        private void UpdateResultOffset(string input)
+        private void UpdateResultOffset(string input, Label label)
         {
             int offsetLabelBy = (input.Length - 1) * 14;
-            calcResultLabel.Location = new Point(503 - offsetLabelBy, 51);
+            label.Location = new Point(503 - offsetLabelBy, label.Location.Y);
         }
 
         private void buttonNumber_Click(object sender, EventArgs e)
         {
             Button inputButton = (Button)sender;
-            AddToInputString(inputButton.Text);
+            AddToPolishStringNumber(inputButton.Text);
         }
 
         private void buttonClear_Click(object sender, EventArgs e)
@@ -115,29 +129,35 @@ namespace Calculator
             ClearCalculations();
         }
 
+        string heldCalc = "";
         private void buttonParseAndAddCalculation_Click(object sender, EventArgs e)
         {
-            // Add input string to calculations list
-            Number newNumber = new Number();
-            newNumber.SetDataString(m_InputString);
-            calculations.Add(newNumber);
             ResetInputString(); // Reset the input string again
 
             Button inputButton = (Button)sender;
-            switch (inputButton.Text)
-            {
-                case "+":
-                    CalculationAdd newAdd = new CalculationAdd();
-                    newAdd.SetDataString(newNumber.GetDataString());
-                    calculations.Add(newAdd);
-                    break;
-                case "*":
-                    CalculationMultiply newMultiply = new CalculationMultiply(); ;
-                    newMultiply.SetDataString(newNumber.GetDataString());
-                    calculations.Add(newMultiply);
-                    break;
 
+            string polishString = inputButton.Text;
+            ClearPolandNumber();
+
+            if (heldCalc == "")
+            {
+                if (polishString != heldCalc)
+                    heldCalc = polishString;
             }
+            else
+            {
+                AddToPolishString(heldCalc);
+                heldCalc = "";
+            }
+
+            if (inputButton.Text == "=")
+            {
+                AddToPolishString(heldCalc);
+                heldCalc = "";
+            }
+
+            UpdateDebugPoland();
+
             resultStringActive = true;
             CalculateAnswer();
         }
