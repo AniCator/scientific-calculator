@@ -26,7 +26,7 @@ namespace Calculator
         private Stack<string> m_PolishStack = new Stack<string>();
         bool resultStringActive = false;
 
-        private string m_InfixString = "";
+        private string m_sInfixString = "";
 
         public CalculatorWindow()
         {
@@ -116,7 +116,6 @@ namespace Calculator
         {
             if ( strbit == "" || strbit == "=" ) return;
 
-            m_InfixString += strbit + " ";
             m_PolishStack.Push(strbit);
         }
 
@@ -136,8 +135,8 @@ namespace Calculator
         {
             if (numberString == "") return;
 
-            m_InfixString += numberString + " ";
             m_PolishStack.Push(numberString);
+            m_sInfixString += numberString + " ";
             numberString = "";
         }
 
@@ -154,6 +153,20 @@ namespace Calculator
             calculationLabel.Text = ConvertRPNToInfix(polishString.Split(' '));
         }
 
+        private void UpdateResultLabel()
+        {
+            calculationLabel.Text = ConvertRPNToInfix(m_PolishStack.ToArray());
+            calculationLabel.Text = m_sInfixString;
+            UpdateResultOffset(calculationLabel.Text, calculationLabel);
+        }
+
+        private bool IsEmptySpace(string s)
+        {
+            if (s == " ")
+                return true;
+            return false;
+        }
+
         private void CalculateAnswer()
         {
             if (m_PolishStack.Count <= 1) return;
@@ -161,8 +174,45 @@ namespace Calculator
             TokenReader reader = new TokenReader();
 
             List<string> polishTokenList = m_PolishStack.ToList();
+            List<string> splitString = m_sInfixString.Split(' ').ToList();
+            splitString.RemoveAll(IsEmptySpace);
+            splitString.RemoveAt(splitString.Count - 1);
+            foreach (string token in splitString)
+            {
+                Console.WriteLine("Infix Token: " + token);
+            }
 
-            ICalculationExpression resultExpression = reader.ReadToken(polishTokenList);
+            Console.WriteLine("Infix Full: " + m_sInfixString);
+
+            string rpnString = ConvertInfixToRPN(splitString.ToArray());
+            List<string> rpnDisplayString = rpnString.Split(' ').ToList();
+            rpnDisplayString.Reverse();
+            Console.WriteLine("RPN String: " + rpnString);
+            Console.Write("RPN Converted: ");
+            foreach (string token in rpnDisplayString)
+            {
+                Console.Write(token + " ");
+            }
+            Console.Write("\n");
+
+            string stackRpnString = "";
+            foreach (string token in polishTokenList)
+            {
+                stackRpnString += token + " ";
+            }
+            Console.WriteLine("Polish Stack RPN Token: " + stackRpnString);
+
+            polishTokenList = rpnString.Split(' ').ToList();
+
+            ICalculationExpression resultExpression = null;
+            try
+            {
+                resultExpression = reader.ReadToken(polishTokenList);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("FUCKTITS: " + ex.Message);
+            }
 
             ResetInputString();
             BuildCalculationString();
@@ -173,9 +223,9 @@ namespace Calculator
             }
             else
             {
-                calcResultLabel.Text = "0";
-                ClearCalculations();
-                MessageBox.Show("Probleempje!");
+                //calcResultLabel.Text = "0";
+                //ClearCalculations();
+                Console.WriteLine("Kak.");
             }
             UpdateResultOffset(calcResultLabel.Text, calcResultLabel);
             UpdateResultOffset(calculationLabel.Text, calculationLabel);
@@ -186,8 +236,8 @@ namespace Calculator
         {
             debugBox.Clear();
             ClearPoland();
+            m_sInfixString = "";
             sHeldCalc = "";
-            m_InfixString = "";
         }
 
         private void ResetInputString()
@@ -213,9 +263,12 @@ namespace Calculator
                 bFinishedCalculation = false;
             }
 
+            bHoldingOperator = false;
+
             Button inputButton = (Button)sender;
             AddToPolishStringNumber(inputButton.Text);
             bCopyCalc = true;
+            UpdateResultLabel();
         }
 
         private void buttonClear_Click(object sender, EventArgs e)
@@ -226,6 +279,7 @@ namespace Calculator
 
         bool bCopyCalc = false;
         bool bFinishedCalculation = false;
+        bool bHoldingOperator = false;
         string sHeldCalc = "";
         private void buttonParseAndAddCalculation_Click(object sender, EventArgs e)
         {
@@ -234,39 +288,56 @@ namespace Calculator
             Button inputButton = (Button)sender;
 
             string polishString = inputButton.Text;
+            bool bOperatorInput = IsOperator(inputButton.Text);
             PushNumberString();
 
-            // Add held calculation symbol if user wants to finish calculation
-            if (inputButton.Text == "=")
+            if (inputButton.Text != "=" && inputButton.Text != "")
             {
-                AddToPolishString(sHeldCalc);
-                sHeldCalc = "";
-                bFinishedCalculation = true;
+                m_sInfixString += polishString + " ";
             }
-            else if (sHeldCalc == "")
+
+            // Add held calculation symbol if user wants to finish calculation
+            if (bHoldingOperator && bOperatorInput)
             {
-                bFinishedCalculation = false;
-                if (polishString != sHeldCalc)
-                {
-                    sHeldCalc = polishString;
-                }
+                sHeldCalc = polishString;
+                bHoldingOperator = false;
             }
             else
             {
-                bFinishedCalculation = false;
-                if (bCopyCalc)
+                if (inputButton.Text == "=")
                 {
                     AddToPolishString(sHeldCalc);
-                    sHeldCalc = polishString;
-                    bCopyCalc = false;
+                    sHeldCalc = "";
+                    bFinishedCalculation = true;
+                }
+                else if (sHeldCalc == "")
+                {
+                    bFinishedCalculation = false;
+                    if (polishString != sHeldCalc)
+                    {
+                        sHeldCalc = polishString;
+                    }
                 }
                 else
                 {
-                    sHeldCalc = "";
+                    bFinishedCalculation = false;
+                    if (bCopyCalc)
+                    {
+                        AddToPolishString(sHeldCalc);
+                        sHeldCalc = polishString;
+                        bCopyCalc = false;
+                    }
+                    else
+                    {
+                        sHeldCalc = "";
+                    }
                 }
+
+                bHoldingOperator = bOperatorInput;
             }
 
             UpdateDebugPoland();
+            UpdateResultLabel();
 
             resultStringActive = true;
             CalculateAnswer();
@@ -279,7 +350,7 @@ namespace Calculator
 
             foreach (string token in inputTokens)
             {
-                if (!IsOperator(token)) // If token is operator
+                if (IsOperator(token)) // If token is operator
                 {
                     while (stack.Count != 0 && IsOperator(stack.Peek())) // check stack not empty and top item in stack is operator
                     {

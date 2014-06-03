@@ -20,6 +20,7 @@ namespace Calculator
                 if (double.TryParse(tokenList.First(), out i))
                 {
                     tokenList.RemoveAt(0);
+                    Console.WriteLine("Processing number: " + i);
                     return new NumberExpression(i);
                 }
                 else
@@ -27,7 +28,7 @@ namespace Calculator
                     return ReadNonTerminal(tokenList);
                 }
             }
-            catch (InvalidOperationException ex)
+            catch
             {
                 return new NumberExpression(0);
             }
@@ -40,18 +41,21 @@ namespace Calculator
             ICalculationExpression right = ReadNextToken(tokenList);
             ICalculationExpression left = ReadNextToken(tokenList);
 
-            if (token == "+")
-                return new AddExpression(left, right);
-            else if (token == "-")
-                return new SubtractExpression(left, right);
-            else if (token == "*")
-                return new MultiplyExpression(left, right);
-            else if (token == "/")
-                return new DivideExpression(left, right);
+            Console.WriteLine("Processing token: " + token);
+
+            if (token == "sqrt")
+                return new SquareRootExpression(right);
             else if (token == "pow2")
                 return new PowerOfTwoExpression(right);
-            else if (token == "sqrt")
-                return new SquareRootExpression(right);
+            else if (token == "/")
+                return new DivideExpression(left, right);
+            else if (token == "*")
+                return new MultiplyExpression(left, right);
+            else if (token == "-")
+                return new SubtractExpression(left, right);
+            else if (token == "+")
+                return new AddExpression(left, right);
+            
             return null;
         }
     }

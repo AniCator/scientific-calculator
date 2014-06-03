@@ -73,14 +73,14 @@
             this.panel1.Size = new System.Drawing.Size(535, 84);
             this.panel1.TabIndex = 0;
             // 
-            // label2
+            // calculationLabel
             // 
             this.calculationLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.calculationLabel.AutoSize = true;
             this.calculationLabel.Font = new System.Drawing.Font("Calibri", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.calculationLabel.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
             this.calculationLabel.Location = new System.Drawing.Point(503, 3);
-            this.calculationLabel.Name = "label2";
+            this.calculationLabel.Name = "calculationLabel";
             this.calculationLabel.Size = new System.Drawing.Size(29, 33);
             this.calculationLabel.TabIndex = 1;
             this.calculationLabel.Text = "0";
