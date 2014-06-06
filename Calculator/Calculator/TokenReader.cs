@@ -43,18 +43,20 @@ namespace Calculator
 
             Console.WriteLine("Processing token: " + token);
 
-            if (token == "sqrt")
-                return new SquareRootExpression(right);
-            else if (token == "pow2")
-                return new PowerOfTwoExpression(right);
-            else if (token == "/")
-                return new DivideExpression(left, right);
-            else if (token == "*")
-                return new MultiplyExpression(left, right);
+            if (token == "+")
+                return new AddExpression(left, right);
             else if (token == "-")
                 return new SubtractExpression(left, right);
-            else if (token == "+")
-                return new AddExpression(left, right);
+            else if (token == "*")
+                return new MultiplyExpression(left, right);
+            else if (token == "/")
+                return new DivideExpression(left, right);
+            else if (token == "pow2")
+                return new PowerOfTwoExpression(right);
+            else if (token == "sqrt")
+                return new SquareRootExpression(right);
+            else if (token == "1/x")
+                return new MultiplicativeInverseExpression(right);
             
             return null;
         }

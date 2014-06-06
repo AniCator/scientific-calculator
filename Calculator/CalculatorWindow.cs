@@ -30,6 +30,8 @@ namespace Calculator
 
         public CalculatorWindow()
         {
+            AddOperationToken("pow2", "1", true);
+            AddOperationToken("sqrt", "1", true);
             AddOperationToken("+", "2", false);
             AddOperationToken("-", "2", false);
             AddOperationToken("/", "3", false);
@@ -104,6 +106,7 @@ namespace Calculator
 
         private void UpdateDebugPoland()
         {
+            return;
             string polishString = "";
             foreach (string str in m_PolishStack)
             {
@@ -187,6 +190,8 @@ namespace Calculator
             string rpnString = ConvertInfixToRPN(splitString.ToArray());
             List<string> rpnDisplayString = rpnString.Split(' ').ToList();
             rpnDisplayString.Reverse();
+            //rpnDisplayString.RemoveAt(rpnDisplayString.Count - 1);
+            rpnDisplayString.RemoveAt(0);
             Console.WriteLine("RPN String: " + rpnString);
             Console.Write("RPN Converted: ");
             foreach (string token in rpnDisplayString)
@@ -195,6 +200,11 @@ namespace Calculator
             }
             Console.Write("\n");
 
+            foreach (string token in rpnDisplayString)
+            {
+                Console.WriteLine("RPN token: " + token);
+            }
+
             string stackRpnString = "";
             foreach (string token in polishTokenList)
             {
@@ -202,12 +212,12 @@ namespace Calculator
             }
             Console.WriteLine("Polish Stack RPN Token: " + stackRpnString);
 
-            polishTokenList = rpnString.Split(' ').ToList();
+            debugBox.Text = stackRpnString;
 
             ICalculationExpression resultExpression = null;
             try
             {
-                resultExpression = reader.ReadToken(polishTokenList);
+                resultExpression = reader.ReadToken(rpnDisplayString);
             }
             catch (Exception ex)
             {
@@ -398,7 +408,7 @@ namespace Calculator
             {
                 outputString += str + " ";
             }
-
+            Console.WriteLine("ConvertInfixToRPN Output: " + outputString);
             return outputString;
         }
 

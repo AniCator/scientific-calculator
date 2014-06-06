@@ -117,4 +117,19 @@ namespace Calculator
             return Math.Sqrt(ex.Interpret());
         }
     }
+
+    class MultiplicativeInverseExpression : ICalculationExpression
+    {
+        private ICalculationExpression ex;
+
+        public MultiplicativeInverseExpression(ICalculationExpression expr)
+        {
+            this.ex = expr;
+        }
+
+        double ICalculationExpression.Interpret()
+        {
+            return 1 / ex.Interpret();
+        }
+    }
 }
