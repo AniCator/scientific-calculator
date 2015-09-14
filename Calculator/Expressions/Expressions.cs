@@ -16,7 +16,9 @@ namespace Calculator
 
         double ICalculationExpression.Interpret()
         {
-            return number;
+            double result = number;
+
+            return result;
         }
     }
 
@@ -33,7 +35,11 @@ namespace Calculator
 
         double ICalculationExpression.Interpret()
         {
-            return leftEx.Interpret() + rightEx.Interpret();
+            double result = leftEx.Interpret() + rightEx.Interpret();
+#if DEBUG
+            Console.WriteLine("AddExpression: " + result);
+#endif
+            return result;
         }
     }
 
@@ -50,7 +56,11 @@ namespace Calculator
 
         double ICalculationExpression.Interpret()
         {
-            return leftEx.Interpret() - rightEx.Interpret();
+            double result = leftEx.Interpret() - rightEx.Interpret();
+#if DEBUG
+            Console.WriteLine("SubtractExpression: " + result);
+#endif
+            return result;
         }
     }
 
@@ -67,7 +77,11 @@ namespace Calculator
 
         double ICalculationExpression.Interpret()
         {
-            return leftEx.Interpret() * rightEx.Interpret();
+            double result = leftEx.Interpret() * rightEx.Interpret();
+#if DEBUG
+            Console.WriteLine("MultiplyExpression: " + result);
+#endif
+            return result;
         }
     }
 
@@ -84,7 +98,11 @@ namespace Calculator
 
         double ICalculationExpression.Interpret()
         {
-            return leftEx.Interpret() / rightEx.Interpret();
+            double result = leftEx.Interpret() / rightEx.Interpret();
+#if DEBUG
+            Console.WriteLine("DivideExpression: " + result);
+#endif
+            return result;
         }
     }
 
@@ -99,7 +117,11 @@ namespace Calculator
 
         double ICalculationExpression.Interpret()
         {
-            return Math.Pow(ex.Interpret(),2.0);
+            double result = Math.Pow(ex.Interpret(),2.0);
+#if DEBUG
+            Console.WriteLine("PowerOfTwoExpression: " + result);
+#endif
+            return result;
         }
     }
 
@@ -114,7 +136,11 @@ namespace Calculator
 
         double ICalculationExpression.Interpret()
         {
-            return Math.Sqrt(ex.Interpret());
+            double result = Math.Sqrt(ex.Interpret());
+#if DEBUG
+            Console.WriteLine("SquareRootExpression: " + result);
+#endif
+            return result;
         }
     }
 
@@ -129,7 +155,11 @@ namespace Calculator
 
         double ICalculationExpression.Interpret()
         {
-            return 1 / ex.Interpret();
+            double result = 1 / ex.Interpret();
+#if DEBUG
+            Console.WriteLine("MultiplicativeInverseExpression: " + result);
+#endif
+            return result;
         }
     }
 }

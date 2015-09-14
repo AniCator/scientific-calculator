@@ -30,13 +30,14 @@ namespace Calculator
 
         public CalculatorWindow()
         {
-            AddOperationToken("pow2", "1", true);
-            AddOperationToken("sqrt", "1", true);
             AddOperationToken("+", "2", false);
             AddOperationToken("-", "2", false);
             AddOperationToken("/", "3", false);
             AddOperationToken("*", "3", false);
             AddOperationToken("^", "4", true);
+
+            AddOperationToken("pow2", "5", true);
+            AddOperationToken("sqrt", "5", true);
 
             InitializeComponent();
         }
@@ -138,13 +139,36 @@ namespace Calculator
         {
             if (numberString == "") return;
 
+            bool NumberOnTop = false;
+
+            try
+            {
+                Double.Parse(m_PolishStack.Peek());
+                // Fails if it can't parse
+                NumberOnTop = true;
+            }
+            catch (System.Exception ex)
+            {
+                NumberOnTop = false;
+            }
+
+            if (NumberOnTop)
+            {
+                string PreviousString = m_PolishStack.Pop();
+                numberString = PreviousString + numberString;
+            }
+
             m_PolishStack.Push(numberString);
+            //m_sInfixString = ConvertRPNToInfix(m_PolishStack.ToArray());
             m_sInfixString += numberString + " ";
+
             numberString = "";
         }
 
         private void BuildCalculationString()
         {
+            if (m_PolishStack.Count < 1) return;
+
             string polishString = "";
             foreach (string str in m_PolishStack)
             {
@@ -153,13 +177,16 @@ namespace Calculator
 
             polishString = polishString.Substring(0, polishString.Length - 1);
 
-            calculationLabel.Text = ConvertRPNToInfix(polishString.Split(' '));
+            //calculationLabel.Text = ConvertRPNToInfix(polishString.Split(' '));
+            calculationLabel.Text = m_sInfixString;
+
+            UpdateResultOffset(calculationLabel.Text, calculationLabel);
         }
 
         private void UpdateResultLabel()
         {
-            calculationLabel.Text = ConvertRPNToInfix(m_PolishStack.ToArray());
-            calculationLabel.Text = m_sInfixString;
+            //calculationLabel.Text = ConvertRPNToInfix(m_PolishStack.ToArray());
+            //calculationLabel.Text = m_sInfixString;
             UpdateResultOffset(calculationLabel.Text, calculationLabel);
         }
 
@@ -172,7 +199,7 @@ namespace Calculator
 
         private void CalculateAnswer()
         {
-            if (m_PolishStack.Count <= 1) return;
+            //if (m_PolishStack.Count <= 1) return;
 
             TokenReader reader = new TokenReader();
 
@@ -180,39 +207,20 @@ namespace Calculator
             List<string> splitString = m_sInfixString.Split(' ').ToList();
             splitString.RemoveAll(IsEmptySpace);
             splitString.RemoveAt(splitString.Count - 1);
-            foreach (string token in splitString)
-            {
-                Console.WriteLine("Infix Token: " + token);
-            }
-
-            Console.WriteLine("Infix Full: " + m_sInfixString);
 
             string rpnString = ConvertInfixToRPN(splitString.ToArray());
             List<string> rpnDisplayString = rpnString.Split(' ').ToList();
             rpnDisplayString.Reverse();
             //rpnDisplayString.RemoveAt(rpnDisplayString.Count - 1);
             rpnDisplayString.RemoveAt(0);
-            Console.WriteLine("RPN String: " + rpnString);
-            Console.Write("RPN Converted: ");
-            foreach (string token in rpnDisplayString)
-            {
-                Console.Write(token + " ");
-            }
-            Console.Write("\n");
-
-            foreach (string token in rpnDisplayString)
-            {
-                Console.WriteLine("RPN token: " + token);
-            }
 
             string stackRpnString = "";
             foreach (string token in polishTokenList)
             {
                 stackRpnString += token + " ";
             }
-            Console.WriteLine("Polish Stack RPN Token: " + stackRpnString);
 
-            debugBox.Text = stackRpnString;
+            //debugBox.Text = stackRpnString + Environment.NewLine + m_sInfixString;
 
             ICalculationExpression resultExpression = null;
             try
@@ -221,7 +229,7 @@ namespace Calculator
             }
             catch (Exception ex)
             {
-                Console.WriteLine("FUCKTITS: " + ex.Message);
+                Console.WriteLine("Error: " + ex.Message);
             }
 
             ResetInputString();
@@ -229,17 +237,16 @@ namespace Calculator
 
             if (resultExpression != null)
             {
-                calcResultLabel.Text = resultExpression.Interpret().ToString();
+                double result = resultExpression.Interpret();
+                calcResultLabel.Text = result.ToString();
             }
             else
             {
-                //calcResultLabel.Text = "0";
+                calcResultLabel.Text = "Error";
                 //ClearCalculations();
-                Console.WriteLine("Kak.");
+                Console.WriteLine("Error: resultExpression is a 'null' object");
             }
             UpdateResultOffset(calcResultLabel.Text, calcResultLabel);
-            UpdateResultOffset(calculationLabel.Text, calculationLabel);
-            Console.WriteLine(calcResultLabel.Text);
         }
 
         private void ClearCalculations()
@@ -261,11 +268,11 @@ namespace Calculator
 
         private void UpdateResultOffset(string input, Label label)
         {
-            int offsetLabelBy = (input.Length - 1) * 14;
+            int offsetLabelBy = (input.Length - 1) * 11;
             label.Location = new Point(503 - offsetLabelBy, label.Location.Y);
         }
 
-        private void buttonNumber_Click(object sender, EventArgs e)
+        private void AddNumber(string number_text)
         {
             if (bFinishedCalculation)
             {
@@ -275,10 +282,19 @@ namespace Calculator
 
             bHoldingOperator = false;
 
-            Button inputButton = (Button)sender;
-            AddToPolishStringNumber(inputButton.Text);
+            AddToPolishStringNumber(number_text);
             bCopyCalc = true;
+
+            PushNumberString();
+
             UpdateResultLabel();
+            BuildCalculationString();
+        }
+
+        private void buttonNumber_Click(object sender, EventArgs e)
+        {
+            Button inputButton = (Button)sender;
+            AddNumber(inputButton.Text);
         }
 
         private void buttonClear_Click(object sender, EventArgs e)
@@ -299,7 +315,6 @@ namespace Calculator
 
             string polishString = inputButton.Text;
             bool bOperatorInput = IsOperator(inputButton.Text);
-            PushNumberString();
 
             if (inputButton.Text != "=" && inputButton.Text != "")
             {
@@ -307,12 +322,12 @@ namespace Calculator
             }
 
             // Add held calculation symbol if user wants to finish calculation
-            if (bHoldingOperator && bOperatorInput)
+            //if (bHoldingOperator && bOperatorInput)
             {
                 sHeldCalc = polishString;
                 bHoldingOperator = false;
             }
-            else
+            //else
             {
                 if (inputButton.Text == "=")
                 {
@@ -346,7 +361,6 @@ namespace Calculator
                 bHoldingOperator = bOperatorInput;
             }
 
-            UpdateDebugPoland();
             UpdateResultLabel();
 
             resultStringActive = true;
@@ -386,7 +400,8 @@ namespace Calculator
                     {
 					    output.Add(stack.Pop()); // pop it and add it to the output list
                     }
-                    stack.Pop(); // pop whatever
+                    if (stack.Count != 0)
+                        stack.Pop(); // pop whatever
                 }
                 else
                 {
@@ -408,7 +423,6 @@ namespace Calculator
             {
                 outputString += str + " ";
             }
-            Console.WriteLine("ConvertInfixToRPN Output: " + outputString);
             return outputString;
         }
 
@@ -417,12 +431,28 @@ namespace Calculator
             List<string> output = new List<string>();
             Stack<string> stack = new Stack<string>();
 
+            debugBox.Clear();
+
             foreach (string token in inputTokens)
             {
+                debugBox.Text += token + " ";
                 if (IsOperator(token))
                 {
                     stack.Push(token);
                     continue;
+                }
+                else if (token.Equals("("))
+                {
+                    stack.Push(token); // push it directly
+                }
+                else if (token.Equals(")"))
+                {
+                    while (stack.Count != 0 && !stack.Peek().Equals("(")) // while stack isn't empty and next item in the stack isn't a (
+                    {
+                        output.Add(stack.Pop()); // pop it and add it to the output list
+                    }
+                    if(stack.Count != 0)
+                        stack.Pop(); // pop whatever
                 }
                 else
                 {
@@ -447,6 +477,37 @@ namespace Calculator
             }
 
             return outputString;
+        }
+
+        private void CalculatorWindow_KeyPress(object sender, KeyEventArgs e)
+        {
+            string value = "nan";
+
+            if (e.KeyValue >= ((int)Keys.NumPad0) && e.KeyValue <= ((int)Keys.NumPad9))
+            {
+                // Numpad key
+                value = (e.KeyValue - ((int)Keys.NumPad0)).ToString();
+            }
+            else if (e.KeyValue >= ((int)Keys.D0) && e.KeyValue <= ((int)Keys.D9))
+            {
+                // Regular number key
+                value = (e.KeyValue - ((int)Keys.D0)).ToString();
+            }
+
+            if (value != "nan")
+            {
+                AddNumber(value.ToString());
+            }
+            else
+            {
+                switch (e.KeyData)
+                {
+                    case Keys.Add:
+                        break;
+                    default:
+                        break;
+                }
+            }
         }
     }
 }

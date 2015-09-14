@@ -60,6 +60,8 @@
             this.button29 = new System.Windows.Forms.Button();
             this.button30 = new System.Windows.Forms.Button();
             this.debugBox = new System.Windows.Forms.TextBox();
+            this.button8 = new System.Windows.Forms.Button();
+            this.button11 = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -380,11 +382,33 @@
             this.debugBox.Size = new System.Drawing.Size(532, 92);
             this.debugBox.TabIndex = 31;
             // 
+            // button8
+            // 
+            this.button8.Location = new System.Drawing.Point(278, 141);
+            this.button8.Name = "button8";
+            this.button8.Size = new System.Drawing.Size(40, 32);
+            this.button8.TabIndex = 32;
+            this.button8.Text = ")";
+            this.button8.UseVisualStyleBackColor = true;
+            this.button8.Click += new System.EventHandler(this.buttonParseAndAddCalculation_Click);
+            // 
+            // button11
+            // 
+            this.button11.Location = new System.Drawing.Point(232, 141);
+            this.button11.Name = "button11";
+            this.button11.Size = new System.Drawing.Size(40, 32);
+            this.button11.TabIndex = 33;
+            this.button11.Text = "(";
+            this.button11.UseVisualStyleBackColor = true;
+            this.button11.Click += new System.EventHandler(this.buttonParseAndAddCalculation_Click);
+            // 
             // CalculatorWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(560, 453);
+            this.Controls.Add(this.button11);
+            this.Controls.Add(this.button8);
             this.Controls.Add(this.debugBox);
             this.Controls.Add(this.buttonZero);
             this.Controls.Add(this.buttonPeriod);
@@ -416,8 +440,10 @@
             this.Controls.Add(this.button1);
             this.Controls.Add(this.panel1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.KeyPreview = true;
             this.Name = "CalculatorWindow";
             this.Text = "Catorator | Calculator";
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.CalculatorWindow_KeyPress);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.ResumeLayout(false);
@@ -459,6 +485,8 @@
         private System.Windows.Forms.Button button30;
         private System.Windows.Forms.TextBox debugBox;
         private System.Windows.Forms.Label calculationLabel;
+        private System.Windows.Forms.Button button8;
+        private System.Windows.Forms.Button button11;
     }
 }
 
