@@ -11,52 +11,54 @@ using System.IO;
 
 namespace Calculator
 {
-    struct OpPrec
+    struct OperatorPrecedenceInfo
     {
-        public string optoken;
-        public string opprec;
-        public bool opassoc;
+        public string Token;
+        public string Precedence;
+        public bool Associative;
     }
 
     public partial class CalculatorWindow : Form
     {
-        List<OpPrec> operatorInfo = new List<OpPrec>();
+        List<OperatorPrecedenceInfo> m_OperatorPrecedenceInfo = new List<OperatorPrecedenceInfo>();
 
         private string m_InputString = "0";
-        private Stack<string> m_PolishStack = new Stack<string>();
-        bool resultStringActive = false;
+        private string m_InfixString = "";
+        private double m_Memory = 0.0;
 
-        private string m_sInfixString = "";
+        private Stack<string> m_PolishStack = new Stack<string>();
 
         public CalculatorWindow()
         {
+            // Standard operators
             AddOperationToken("+", "2", false);
             AddOperationToken("-", "2", false);
             AddOperationToken("/", "3", false);
             AddOperationToken("*", "3", false);
             AddOperationToken("^", "4", true);
 
+            // Function operators
             AddOperationToken("pow2", "5", true);
-            AddOperationToken("sqrt", "5", true);
+            AddOperationToken("√", "5", true);
 
             InitializeComponent();
         }
 
-        private void AddOperationToken(string optoken_in, string opprec_in, bool opassoc_in)
+        private void AddOperationToken(string inToken, string inPrecedence, bool inAssociative)
         {
-            OpPrec data;
-            data.optoken = optoken_in;
-            data.opprec = opprec_in;
-            data.opassoc = opassoc_in;
+            OperatorPrecedenceInfo data;
+            data.Token = inToken;
+            data.Precedence = inPrecedence;
+            data.Associative = inAssociative;
 
-            operatorInfo.Add(data);
+            m_OperatorPrecedenceInfo.Add(data);
         }
 
         private bool IsOperator(string token)
         {
-            foreach (OpPrec op in operatorInfo)
+            foreach (OperatorPrecedenceInfo OperatorType in m_OperatorPrecedenceInfo)
             {
-                if (op.optoken == token)
+                if (OperatorType.Token == token)
                     return true;
             }
             return false;
@@ -68,11 +70,11 @@ namespace Calculator
             {
                 throw new ArgumentException("Invalid token: " + token);
             }
-            foreach (OpPrec op in operatorInfo)
+            foreach (OperatorPrecedenceInfo op in m_OperatorPrecedenceInfo)
             {
-                if (op.optoken == token)
+                if (op.Token == token)
                 {
-                    if (op.opassoc == type)
+                    if (op.Associative == type)
                     {
                         return true;
                     }
@@ -90,15 +92,15 @@ namespace Calculator
 
             int prec1 = 0;
             int prec2 = 0;
-            foreach (OpPrec op in operatorInfo)
+            foreach (OperatorPrecedenceInfo op in m_OperatorPrecedenceInfo)
             {
-                if (op.optoken == token1)
+                if (op.Token == token1)
                 {
-                    prec1 = int.Parse(op.opprec);
+                    prec1 = int.Parse(op.Precedence);
                 }
-                if (op.optoken == token2)
+                if (op.Token == token2)
                 {
-                    prec2 = int.Parse(op.opprec);
+                    prec2 = int.Parse(op.Precedence);
                 }
             }
 
@@ -108,12 +110,12 @@ namespace Calculator
         private void UpdateDebugPoland()
         {
             return;
-            string polishString = "";
+            /*string polishString = "";
             foreach (string str in m_PolishStack)
             {
                 polishString += str + " ";
             }
-            debugBox.Text = polishString;
+            debugBox.Text = polishString;*/
         }
 
         private void AddToPolishString(string strbit)
@@ -129,15 +131,15 @@ namespace Calculator
             m_PolishStack.Clear();
         }
 
-        string numberString = "";
+        string m_NumberString = "";
         private void AddToPolishStringNumber(string number)
         {
-            numberString += number;
+            m_NumberString += number;
         }
 
         private void PushNumberString()
         {
-            if (numberString == "") return;
+            if (m_NumberString == "") return;
 
             bool NumberOnTop = false;
 
@@ -147,7 +149,7 @@ namespace Calculator
                 // Fails if it can't parse
                 NumberOnTop = true;
             }
-            catch (System.Exception ex)
+            catch (System.Exception)
             {
                 NumberOnTop = false;
             }
@@ -155,39 +157,30 @@ namespace Calculator
             if (NumberOnTop)
             {
                 string PreviousString = m_PolishStack.Pop();
-                numberString = PreviousString + numberString;
+                //m_NumberString = PreviousString + m_NumberString;
             }
 
-            m_PolishStack.Push(numberString);
-            //m_sInfixString = ConvertRPNToInfix(m_PolishStack.ToArray());
-            m_sInfixString += numberString + " ";
+            m_PolishStack.Push(m_NumberString);
+            //m_InfixString = ConvertRPNToInfix(m_PolishStack.ToArray());
+            m_InfixString += m_NumberString + " ";
 
-            numberString = "";
+            m_NumberString = "";
         }
 
         private void BuildCalculationString()
         {
-            if (m_PolishStack.Count < 1) return;
+            calculationLabel.Text = m_InfixString;
 
-            string polishString = "";
-            foreach (string str in m_PolishStack)
+            if (m_NumberString != "")
             {
-                polishString += str + " ";
+                calculationLabel.Text += m_NumberString;
             }
-
-            polishString = polishString.Substring(0, polishString.Length - 1);
-
-            //calculationLabel.Text = ConvertRPNToInfix(polishString.Split(' '));
-            calculationLabel.Text = m_sInfixString;
-
-            UpdateResultOffset(calculationLabel.Text, calculationLabel);
         }
 
         private void UpdateResultLabel()
         {
             //calculationLabel.Text = ConvertRPNToInfix(m_PolishStack.ToArray());
             //calculationLabel.Text = m_sInfixString;
-            UpdateResultOffset(calculationLabel.Text, calculationLabel);
         }
 
         private bool IsEmptySpace(string s)
@@ -201,18 +194,26 @@ namespace Calculator
         {
             //if (m_PolishStack.Count <= 1) return;
 
-            TokenReader reader = new TokenReader();
+            TokenReader PolishTokenReader = new TokenReader();
+
+            string m_CombinedInfixString = m_InfixString;
+            if(m_NumberString != "")
+            {
+                m_CombinedInfixString += m_NumberString + ' ';
+            }
 
             List<string> polishTokenList = m_PolishStack.ToList();
-            List<string> splitString = m_sInfixString.Split(' ').ToList();
-            splitString.RemoveAll(IsEmptySpace);
-            splitString.RemoveAt(splitString.Count - 1);
+            List<string> infixStringArray = m_CombinedInfixString.Split(' ').ToList();
+            infixStringArray.RemoveAll(IsEmptySpace);
+            infixStringArray.RemoveAt(infixStringArray.Count - 1);
 
-            string rpnString = ConvertInfixToRPN(splitString.ToArray());
+            string rpnString = ConvertInfixToRPN(infixStringArray.ToArray());
             List<string> rpnDisplayString = rpnString.Split(' ').ToList();
             rpnDisplayString.Reverse();
             //rpnDisplayString.RemoveAt(rpnDisplayString.Count - 1);
             rpnDisplayString.RemoveAt(0);
+
+            debugBox.Text = rpnString;
 
             string stackRpnString = "";
             foreach (string token in polishTokenList)
@@ -225,7 +226,7 @@ namespace Calculator
             ICalculationExpression resultExpression = null;
             try
             {
-                resultExpression = reader.ReadToken(rpnDisplayString);
+                resultExpression = PolishTokenReader.ReadToken(rpnDisplayString);
             }
             catch (Exception ex)
             {
@@ -237,8 +238,17 @@ namespace Calculator
 
             if (resultExpression != null)
             {
-                double result = resultExpression.Interpret();
-                calcResultLabel.Text = result.ToString();
+                string resultString = "Infinity?";
+                try {
+                    double result = resultExpression.Interpret();
+                    resultString = result.ToString();
+                }
+                catch(NullReferenceException exception)
+                {
+                    Console.WriteLine(exception.Message);
+                }
+
+                calcResultLabel.Text = resultString;
             }
             else
             {
@@ -246,49 +256,131 @@ namespace Calculator
                 //ClearCalculations();
                 Console.WriteLine("Error: resultExpression is a 'null' object");
             }
-            UpdateResultOffset(calcResultLabel.Text, calcResultLabel);
         }
 
         private void ClearCalculations()
         {
             debugBox.Clear();
             ClearPoland();
-            m_sInfixString = "";
-            sHeldCalc = "";
+            m_InfixString = "";
+            m_sHeldOperator = "";
         }
 
         private void ResetInputString()
         {
             m_InputString = "0";
             calculationLabel.Text = "0";
-            calculationLabel.Location = new Point(503, calculationLabel.Location.Y);
             calcResultLabel.Text = m_InputString;
-            calcResultLabel.Location = new Point(503, calcResultLabel.Location.Y);
-        }
-
-        private void UpdateResultOffset(string input, Label label)
-        {
-            int offsetLabelBy = (input.Length - 1) * 11;
-            label.Location = new Point(503 - offsetLabelBy, label.Location.Y);
         }
 
         private void AddNumber(string number_text)
         {
-            if (bFinishedCalculation)
+            if (m_bFinishedCalculation)
             {
                 ClearCalculations();
-                bFinishedCalculation = false;
+                m_bFinishedCalculation = false;
             }
-
-            bHoldingOperator = false;
+            
+            m_bHoldingOperator = false;
 
             AddToPolishStringNumber(number_text);
-            bCopyCalc = true;
-
-            PushNumberString();
+            m_bCopyCalc = true;
 
             UpdateResultLabel();
-            BuildCalculationString();
+            CalculateAnswer();
+        }
+
+        private void ParseButton(String polishString)
+        {
+            ResetInputString(); // Reset the input string again
+            PushNumberString();
+
+            bool bOperatorInput = IsOperator(polishString);
+
+            if (!(bOperatorInput && m_bHoldingOperator && (m_sHeldOperator != "(" || m_sHeldOperator != ")")))
+            {
+                if (polishString != "=" && polishString != "")
+                {
+                    m_InfixString += polishString + " ";
+                }
+
+                {
+                    if (polishString == "=")
+                    {
+                        AddToPolishString(m_sHeldOperator);
+                        m_sHeldOperator = "";
+                        m_bFinishedCalculation = true;
+                    }
+                    else if (m_sHeldOperator == "")
+                    {
+                        m_bFinishedCalculation = false;
+                        if (polishString != m_sHeldOperator)
+                        {
+                            m_sHeldOperator = polishString;
+                        }
+                    }
+                    else
+                    {
+                        m_bFinishedCalculation = false;
+                        if (m_bCopyCalc)
+                        {
+                            AddToPolishString(m_sHeldOperator);
+                            m_sHeldOperator = polishString;
+                            m_bCopyCalc = false;
+                        }
+                        else
+                        {
+                            m_sHeldOperator = "";
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if(m_sHeldOperator != polishString)
+                {
+                    int Length = m_InfixString.Length - 2;
+                    if (Length > 0)
+                    {
+                        m_InfixString = m_InfixString.Substring(0, Length);
+                        m_sHeldOperator = polishString;
+                        m_InfixString += polishString + " ";
+                    }
+                }
+            }
+
+            m_bHoldingOperator = bOperatorInput;
+
+            UpdateResultLabel();
+            CalculateAnswer();
+        }
+
+        private void ClearEntry()
+        {
+            if (m_NumberString != "")
+            {
+                if (!m_bHoldingOperator)
+                {
+                    m_NumberString = "";
+                    m_sHeldOperator = "";
+                    m_bHoldingOperator = true;
+                }
+            }
+            else
+            {
+                if (m_bHoldingOperator)
+                {
+                    int Length = m_InfixString.Length - 2;
+                    if (Length > 0)
+                    {
+                        m_InfixString = m_InfixString.Substring(0, Length);
+                        m_sHeldOperator = "";
+                        m_bHoldingOperator = true;
+                    }
+                }
+            }
+
+            CalculateAnswer();
         }
 
         private void buttonNumber_Click(object sender, EventArgs e)
@@ -303,68 +395,20 @@ namespace Calculator
             ClearCalculations();
         }
 
-        bool bCopyCalc = false;
-        bool bFinishedCalculation = false;
-        bool bHoldingOperator = false;
-        string sHeldCalc = "";
+        private void buttonClearEntry_Click(object sender, EventArgs e)
+        {
+            ClearEntry();
+        }
+
+        bool m_bCopyCalc = false;
+        bool m_bFinishedCalculation = false;
+        bool m_bHoldingOperator = false;
+        string m_sHeldOperator = "";
         private void buttonParseAndAddCalculation_Click(object sender, EventArgs e)
         {
-            ResetInputString(); // Reset the input string again
-
             Button inputButton = (Button)sender;
 
-            string polishString = inputButton.Text;
-            bool bOperatorInput = IsOperator(inputButton.Text);
-
-            if (inputButton.Text != "=" && inputButton.Text != "")
-            {
-                m_sInfixString += polishString + " ";
-            }
-
-            // Add held calculation symbol if user wants to finish calculation
-            //if (bHoldingOperator && bOperatorInput)
-            {
-                sHeldCalc = polishString;
-                bHoldingOperator = false;
-            }
-            //else
-            {
-                if (inputButton.Text == "=")
-                {
-                    AddToPolishString(sHeldCalc);
-                    sHeldCalc = "";
-                    bFinishedCalculation = true;
-                }
-                else if (sHeldCalc == "")
-                {
-                    bFinishedCalculation = false;
-                    if (polishString != sHeldCalc)
-                    {
-                        sHeldCalc = polishString;
-                    }
-                }
-                else
-                {
-                    bFinishedCalculation = false;
-                    if (bCopyCalc)
-                    {
-                        AddToPolishString(sHeldCalc);
-                        sHeldCalc = polishString;
-                        bCopyCalc = false;
-                    }
-                    else
-                    {
-                        sHeldCalc = "";
-                    }
-                }
-
-                bHoldingOperator = bOperatorInput;
-            }
-
-            UpdateResultLabel();
-
-            resultStringActive = true;
-            CalculateAnswer();
+            ParseButton(inputButton.Text);
         }
 
         private string ConvertInfixToRPN(string[] inputTokens)
@@ -433,9 +477,16 @@ namespace Calculator
 
             debugBox.Clear();
 
+            debugBox.Text = "ConvertRPNToInfix\r\nRPN: ";
             foreach (string token in inputTokens)
             {
                 debugBox.Text += token + " ";
+            }
+
+            debugBox.Text += "\r\n";
+
+            foreach (string token in inputTokens)
+            {
                 if (IsOperator(token))
                 {
                     stack.Push(token);
@@ -476,10 +527,12 @@ namespace Calculator
                 outputString += str + " ";
             }
 
+            debugBox.Text += "Infix: " + outputString;
+
             return outputString;
         }
 
-        private void CalculatorWindow_KeyPress(object sender, KeyEventArgs e)
+        private void CalculatorWindow_KeyDown(object sender, KeyEventArgs e)
         {
             string value = "nan";
 
@@ -497,17 +550,81 @@ namespace Calculator
             if (value != "nan")
             {
                 AddNumber(value.ToString());
+                BuildCalculationString();
             }
             else
             {
                 switch (e.KeyData)
                 {
                     case Keys.Add:
+                        ParseButton("+");
+                        break;
+                    case Keys.Subtract:
+                        ParseButton("-");
+                        break;
+                    case Keys.Multiply:
+                        ParseButton("*");
+                        break;
+                    case Keys.Divide:
+                        ParseButton("/");
+                        break;
+                    case Keys.Delete:
+                    case Keys.Back:
+                        ClearEntry();
                         break;
                     default:
                         break;
                 }
             }
+        }
+
+        protected override bool ProcessDialogKey(Keys keyData)
+        {
+            if (((keyData & Keys.Enter) == Keys.Enter) && (this.ContainsFocus))
+            {
+                ParseButton("=");
+                return false;
+            }
+
+            return base.ProcessDialogKey(keyData);
+        }
+
+        private void buttomMemoryClear_Click(object sender, EventArgs e)
+        {
+            m_Memory = 0.0;
+        }
+
+        private void buttonMemoryAdd_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                m_Memory += Double.Parse(calcResultLabel.Text);
+            }
+            catch (Exception) { }
+        }
+
+        private void buttonMemorySubtract_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                m_Memory -= Double.Parse(calcResultLabel.Text);
+            }
+            catch (Exception) { }
+        }
+
+        private void buttonMemoryAssign_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                m_Memory = Double.Parse(calcResultLabel.Text);
+            }
+            catch (Exception) { }
+        }
+
+        private void buttonMemoryRead_Click(object sender, EventArgs e)
+        {
+            m_NumberString = m_Memory.ToString();
+            CalculateAnswer();
         }
     }
 }

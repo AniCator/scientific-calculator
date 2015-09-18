@@ -50,7 +50,7 @@ namespace Calculator
                 return new DivideExpression(left, right);
             else if (token == "pow2")
                 return new PowerOfTwoExpression(right);
-            else if (token == "sqrt")
+            else if (token == "√")
                 return new SquareRootExpression(right);
             else if (token == "1/x")
                 return new MultiplicativeInverseExpression(right);

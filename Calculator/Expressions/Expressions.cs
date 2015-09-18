@@ -5,6 +5,14 @@ using System.Text;
 
 namespace Calculator
 {
+    abstract class CalculationExpression : ICalculationExpression
+    {
+        protected ICalculationExpression leftEx;
+        protected ICalculationExpression rightEx;
+
+        abstract public double Interpret();
+    }
+
     class NumberExpression : ICalculationExpression
     {
         private double number;
@@ -22,143 +30,112 @@ namespace Calculator
         }
     }
 
-    class AddExpression : ICalculationExpression
+    class AddExpression : CalculationExpression
     {
-        private ICalculationExpression leftEx;
-        private ICalculationExpression rightEx;
-
         public AddExpression(ICalculationExpression left, ICalculationExpression right)
         {
             this.leftEx = left;
             this.rightEx = right;
         }
 
-        double ICalculationExpression.Interpret()
+        public override double Interpret()
         {
             double result = leftEx.Interpret() + rightEx.Interpret();
-#if DEBUG
-            Console.WriteLine("AddExpression: " + result);
-#endif
+
             return result;
         }
     }
 
-    class SubtractExpression : ICalculationExpression
+    class SubtractExpression : CalculationExpression
     {
-        private ICalculationExpression leftEx;
-        private ICalculationExpression rightEx;
-
         public SubtractExpression(ICalculationExpression left, ICalculationExpression right)
         {
             this.leftEx = left;
             this.rightEx = right;
         }
 
-        double ICalculationExpression.Interpret()
+        public override double Interpret()
         {
-            double result = leftEx.Interpret() - rightEx.Interpret();
-#if DEBUG
-            Console.WriteLine("SubtractExpression: " + result);
-#endif
+            double result = 0;
+            result = leftEx.Interpret() - rightEx.Interpret();
+
             return result;
         }
     }
 
-    class MultiplyExpression : ICalculationExpression
+    class MultiplyExpression : CalculationExpression
     {
-        private ICalculationExpression leftEx;
-        private ICalculationExpression rightEx;
-
         public MultiplyExpression(ICalculationExpression left, ICalculationExpression right)
         {
             this.leftEx = left;
             this.rightEx = right;
         }
 
-        double ICalculationExpression.Interpret()
+        public override double Interpret()
         {
             double result = leftEx.Interpret() * rightEx.Interpret();
-#if DEBUG
-            Console.WriteLine("MultiplyExpression: " + result);
-#endif
+
             return result;
         }
     }
 
-    class DivideExpression : ICalculationExpression
+    class DivideExpression : CalculationExpression
     {
-        private ICalculationExpression leftEx;
-        private ICalculationExpression rightEx;
-
         public DivideExpression(ICalculationExpression left, ICalculationExpression right)
         {
             this.leftEx = left;
             this.rightEx = right;
         }
 
-        double ICalculationExpression.Interpret()
+        public override double Interpret()
         {
             double result = leftEx.Interpret() / rightEx.Interpret();
-#if DEBUG
-            Console.WriteLine("DivideExpression: " + result);
-#endif
+
             return result;
         }
     }
 
-    class PowerOfTwoExpression : ICalculationExpression
+    class PowerOfTwoExpression : CalculationExpression
     {
-        private ICalculationExpression ex;
-
         public PowerOfTwoExpression(ICalculationExpression expr)
         {
-            this.ex = expr;
+            this.rightEx = expr;
         }
 
-        double ICalculationExpression.Interpret()
+        public override double Interpret()
         {
-            double result = Math.Pow(ex.Interpret(),2.0);
-#if DEBUG
-            Console.WriteLine("PowerOfTwoExpression: " + result);
-#endif
+            double result = Math.Pow(rightEx.Interpret(),2.0);
+
             return result;
         }
     }
 
-    class SquareRootExpression : ICalculationExpression
+    class SquareRootExpression : CalculationExpression
     {
-        private ICalculationExpression ex;
-
         public SquareRootExpression(ICalculationExpression expr)
         {
-            this.ex = expr;
+            this.rightEx = expr;
         }
 
-        double ICalculationExpression.Interpret()
+        public override double Interpret()
         {
-            double result = Math.Sqrt(ex.Interpret());
-#if DEBUG
-            Console.WriteLine("SquareRootExpression: " + result);
-#endif
+            double result = Math.Sqrt(rightEx.Interpret());
+
             return result;
         }
     }
 
-    class MultiplicativeInverseExpression : ICalculationExpression
+    class MultiplicativeInverseExpression : CalculationExpression
     {
-        private ICalculationExpression ex;
-
         public MultiplicativeInverseExpression(ICalculationExpression expr)
         {
-            this.ex = expr;
+            this.rightEx = expr;
         }
 
-        double ICalculationExpression.Interpret()
+        public override double Interpret()
         {
-            double result = 1 / ex.Interpret();
-#if DEBUG
-            Console.WriteLine("MultiplicativeInverseExpression: " + result);
-#endif
+            double result = 1 / rightEx.Interpret();
+
             return result;
         }
     }

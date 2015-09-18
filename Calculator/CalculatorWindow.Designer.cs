@@ -31,11 +31,11 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.calculationLabel = new System.Windows.Forms.Label();
             this.calcResultLabel = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
-            this.button3 = new System.Windows.Forms.Button();
-            this.button4 = new System.Windows.Forms.Button();
-            this.button5 = new System.Windows.Forms.Button();
+            this.buttonMemorySubtract = new System.Windows.Forms.Button();
+            this.buttonMemoryAdd = new System.Windows.Forms.Button();
+            this.buttonMemoryAssign = new System.Windows.Forms.Button();
+            this.buttonMemoryRead = new System.Windows.Forms.Button();
+            this.buttonMemoryClear = new System.Windows.Forms.Button();
             this.button6 = new System.Windows.Forms.Button();
             this.button7 = new System.Windows.Forms.Button();
             this.buttonClear = new System.Windows.Forms.Button();
@@ -58,7 +58,7 @@
             this.buttonZero = new System.Windows.Forms.Button();
             this.buttonPeriod = new System.Windows.Forms.Button();
             this.button29 = new System.Windows.Forms.Button();
-            this.button30 = new System.Windows.Forms.Button();
+            this.buttonEquals = new System.Windows.Forms.Button();
             this.debugBox = new System.Windows.Forms.TextBox();
             this.button8 = new System.Windows.Forms.Button();
             this.button11 = new System.Windows.Forms.Button();
@@ -77,72 +77,74 @@
             // 
             // calculationLabel
             // 
-            this.calculationLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.calculationLabel.AutoSize = true;
-            this.calculationLabel.Font = new System.Drawing.Font("Calibri", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.calculationLabel.Font = new System.Drawing.Font("Calibri", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.calculationLabel.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
-            this.calculationLabel.Location = new System.Drawing.Point(503, 3);
+            this.calculationLabel.Location = new System.Drawing.Point(3, 3);
             this.calculationLabel.Name = "calculationLabel";
-            this.calculationLabel.Size = new System.Drawing.Size(29, 33);
+            this.calculationLabel.Size = new System.Drawing.Size(529, 48);
             this.calculationLabel.TabIndex = 1;
             this.calculationLabel.Text = "0";
+            this.calculationLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // calcResultLabel
             // 
-            this.calcResultLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.calcResultLabel.AutoSize = true;
             this.calcResultLabel.Font = new System.Drawing.Font("Calibri", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.calcResultLabel.Location = new System.Drawing.Point(503, 51);
+            this.calcResultLabel.Location = new System.Drawing.Point(3, 51);
             this.calcResultLabel.Name = "calcResultLabel";
-            this.calcResultLabel.Size = new System.Drawing.Size(29, 33);
+            this.calcResultLabel.Size = new System.Drawing.Size(529, 33);
             this.calcResultLabel.TabIndex = 0;
             this.calcResultLabel.Text = "0";
-            this.calcResultLabel.TextAlign = System.Drawing.ContentAlignment.BottomRight;
+            this.calcResultLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
-            // button1
+            // buttonMemorySubtract
             // 
-            this.button1.Location = new System.Drawing.Point(508, 103);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(40, 32);
-            this.button1.TabIndex = 1;
-            this.button1.Text = "M-";
-            this.button1.UseVisualStyleBackColor = true;
+            this.buttonMemorySubtract.Location = new System.Drawing.Point(508, 103);
+            this.buttonMemorySubtract.Name = "buttonMemorySubtract";
+            this.buttonMemorySubtract.Size = new System.Drawing.Size(40, 32);
+            this.buttonMemorySubtract.TabIndex = 1;
+            this.buttonMemorySubtract.Text = "M-";
+            this.buttonMemorySubtract.UseVisualStyleBackColor = true;
+            this.buttonMemorySubtract.Click += new System.EventHandler(this.buttonMemorySubtract_Click);
             // 
-            // button2
+            // buttonMemoryAdd
             // 
-            this.button2.Location = new System.Drawing.Point(462, 103);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(40, 32);
-            this.button2.TabIndex = 2;
-            this.button2.Text = "M+";
-            this.button2.UseVisualStyleBackColor = true;
+            this.buttonMemoryAdd.Location = new System.Drawing.Point(462, 103);
+            this.buttonMemoryAdd.Name = "buttonMemoryAdd";
+            this.buttonMemoryAdd.Size = new System.Drawing.Size(40, 32);
+            this.buttonMemoryAdd.TabIndex = 2;
+            this.buttonMemoryAdd.Text = "M+";
+            this.buttonMemoryAdd.UseVisualStyleBackColor = true;
+            this.buttonMemoryAdd.Click += new System.EventHandler(this.buttonMemoryAdd_Click);
             // 
-            // button3
+            // buttonMemoryAssign
             // 
-            this.button3.Location = new System.Drawing.Point(416, 103);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(40, 32);
-            this.button3.TabIndex = 3;
-            this.button3.Text = "MS";
-            this.button3.UseVisualStyleBackColor = true;
+            this.buttonMemoryAssign.Location = new System.Drawing.Point(416, 103);
+            this.buttonMemoryAssign.Name = "buttonMemoryAssign";
+            this.buttonMemoryAssign.Size = new System.Drawing.Size(40, 32);
+            this.buttonMemoryAssign.TabIndex = 3;
+            this.buttonMemoryAssign.Text = "MS";
+            this.buttonMemoryAssign.UseVisualStyleBackColor = true;
+            this.buttonMemoryAssign.Click += new System.EventHandler(this.buttonMemoryAssign_Click);
             // 
-            // button4
+            // buttonMemoryRead
             // 
-            this.button4.Location = new System.Drawing.Point(370, 103);
-            this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(40, 32);
-            this.button4.TabIndex = 4;
-            this.button4.Text = "MR";
-            this.button4.UseVisualStyleBackColor = true;
+            this.buttonMemoryRead.Location = new System.Drawing.Point(370, 103);
+            this.buttonMemoryRead.Name = "buttonMemoryRead";
+            this.buttonMemoryRead.Size = new System.Drawing.Size(40, 32);
+            this.buttonMemoryRead.TabIndex = 4;
+            this.buttonMemoryRead.Text = "MR";
+            this.buttonMemoryRead.UseVisualStyleBackColor = true;
+            this.buttonMemoryRead.Click += new System.EventHandler(this.buttonMemoryRead_Click);
             // 
-            // button5
+            // buttonMemoryClear
             // 
-            this.button5.Location = new System.Drawing.Point(324, 103);
-            this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(40, 32);
-            this.button5.TabIndex = 5;
-            this.button5.Text = "MC";
-            this.button5.UseVisualStyleBackColor = true;
+            this.buttonMemoryClear.Location = new System.Drawing.Point(324, 103);
+            this.buttonMemoryClear.Name = "buttonMemoryClear";
+            this.buttonMemoryClear.Size = new System.Drawing.Size(40, 32);
+            this.buttonMemoryClear.TabIndex = 5;
+            this.buttonMemoryClear.Text = "MC";
+            this.buttonMemoryClear.UseVisualStyleBackColor = true;
+            this.buttonMemoryClear.Click += new System.EventHandler(this.buttomMemoryClear_Click);
             // 
             // button6
             // 
@@ -150,7 +152,7 @@
             this.button6.Name = "button6";
             this.button6.Size = new System.Drawing.Size(40, 32);
             this.button6.TabIndex = 10;
-            this.button6.Text = "<-";
+            this.button6.Text = "←";
             this.button6.UseVisualStyleBackColor = true;
             // 
             // button7
@@ -161,7 +163,7 @@
             this.button7.TabIndex = 9;
             this.button7.Text = "CE";
             this.button7.UseVisualStyleBackColor = true;
-            this.button7.Click += new System.EventHandler(this.buttonClear_Click);
+            this.button7.Click += new System.EventHandler(this.buttonClearEntry_Click);
             // 
             // buttonClear
             // 
@@ -189,7 +191,7 @@
             this.button10.Name = "button10";
             this.button10.Size = new System.Drawing.Size(40, 32);
             this.button10.TabIndex = 6;
-            this.button10.Text = "sqrt";
+            this.button10.Text = "√";
             this.button10.UseVisualStyleBackColor = true;
             this.button10.Click += new System.EventHandler(this.buttonParseAndAddCalculation_Click);
             // 
@@ -364,15 +366,15 @@
             this.button29.UseVisualStyleBackColor = true;
             this.button29.Click += new System.EventHandler(this.buttonParseAndAddCalculation_Click);
             // 
-            // button30
+            // buttonEquals
             // 
-            this.button30.Location = new System.Drawing.Point(508, 255);
-            this.button30.Name = "button30";
-            this.button30.Size = new System.Drawing.Size(40, 70);
-            this.button30.TabIndex = 26;
-            this.button30.Text = "=";
-            this.button30.UseVisualStyleBackColor = true;
-            this.button30.Click += new System.EventHandler(this.buttonParseAndAddCalculation_Click);
+            this.buttonEquals.Location = new System.Drawing.Point(508, 255);
+            this.buttonEquals.Name = "buttonEquals";
+            this.buttonEquals.Size = new System.Drawing.Size(40, 70);
+            this.buttonEquals.TabIndex = 26;
+            this.buttonEquals.Text = "=";
+            this.buttonEquals.UseVisualStyleBackColor = true;
+            this.buttonEquals.Click += new System.EventHandler(this.buttonParseAndAddCalculation_Click);
             // 
             // debugBox
             // 
@@ -413,7 +415,7 @@
             this.Controls.Add(this.buttonZero);
             this.Controls.Add(this.buttonPeriod);
             this.Controls.Add(this.button29);
-            this.Controls.Add(this.button30);
+            this.Controls.Add(this.buttonEquals);
             this.Controls.Add(this.buttonOne);
             this.Controls.Add(this.buttonTwo);
             this.Controls.Add(this.buttonThree);
@@ -433,19 +435,18 @@
             this.Controls.Add(this.buttonClear);
             this.Controls.Add(this.button9);
             this.Controls.Add(this.button10);
-            this.Controls.Add(this.button5);
-            this.Controls.Add(this.button4);
-            this.Controls.Add(this.button3);
-            this.Controls.Add(this.button2);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.buttonMemoryClear);
+            this.Controls.Add(this.buttonMemoryRead);
+            this.Controls.Add(this.buttonMemoryAssign);
+            this.Controls.Add(this.buttonMemoryAdd);
+            this.Controls.Add(this.buttonMemorySubtract);
             this.Controls.Add(this.panel1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.KeyPreview = true;
             this.Name = "CalculatorWindow";
             this.Text = "Catorator | Calculator";
-            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.CalculatorWindow_KeyPress);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.CalculatorWindow_KeyDown);
             this.panel1.ResumeLayout(false);
-            this.panel1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -455,11 +456,11 @@
 
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Label calcResultLabel;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.Button button3;
-        private System.Windows.Forms.Button button4;
-        private System.Windows.Forms.Button button5;
+        private System.Windows.Forms.Button buttonMemorySubtract;
+        private System.Windows.Forms.Button buttonMemoryAdd;
+        private System.Windows.Forms.Button buttonMemoryAssign;
+        private System.Windows.Forms.Button buttonMemoryRead;
+        private System.Windows.Forms.Button buttonMemoryClear;
         private System.Windows.Forms.Button button6;
         private System.Windows.Forms.Button button7;
         private System.Windows.Forms.Button buttonClear;
@@ -482,7 +483,7 @@
         private System.Windows.Forms.Button buttonZero;
         private System.Windows.Forms.Button buttonPeriod;
         private System.Windows.Forms.Button button29;
-        private System.Windows.Forms.Button button30;
+        private System.Windows.Forms.Button buttonEquals;
         private System.Windows.Forms.TextBox debugBox;
         private System.Windows.Forms.Label calculationLabel;
         private System.Windows.Forms.Button button8;
