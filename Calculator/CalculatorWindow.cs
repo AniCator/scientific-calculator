@@ -273,7 +273,7 @@ namespace Calculator
             calcResultLabel.Text = m_InputString;
         }
 
-        private void AddNumber(string number_text)
+        private void AddNumber(string numberText)
         {
             if (m_bFinishedCalculation)
             {
@@ -283,7 +283,7 @@ namespace Calculator
             
             m_bHoldingOperator = false;
 
-            AddToPolishStringNumber(number_text);
+            AddToPolishStringNumber(numberText);
             m_bCopyCalc = true;
 
             UpdateResultLabel();
