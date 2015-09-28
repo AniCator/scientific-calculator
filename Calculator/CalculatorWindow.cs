@@ -165,6 +165,8 @@ namespace Calculator
             m_InfixString += m_NumberString + " ";
 
             m_NumberString = "";
+
+            m_bDecimalEntered = false;
         }
 
         private void BuildCalculationString()
@@ -275,6 +277,21 @@ namespace Calculator
 
         private void AddNumber(string numberText)
         {
+            if (numberText == ".")
+            {
+                // Do not allow the entry of a decimal point 
+                // when a decimal has already been entered 
+                // nor when the number string is empty.
+                if (m_bDecimalEntered || m_NumberString.Length == 0)
+                {
+                    return;
+                }
+                else
+                {
+                    m_bDecimalEntered = true;
+                }
+            }
+
             if (m_bFinishedCalculation)
             {
                 ClearCalculations();
@@ -403,6 +420,7 @@ namespace Calculator
         bool m_bCopyCalc = false;
         bool m_bFinishedCalculation = false;
         bool m_bHoldingOperator = false;
+        bool m_bDecimalEntered = false;
         string m_sHeldOperator = "";
         private void buttonParseAndAddCalculation_Click(object sender, EventArgs e)
         {
@@ -567,6 +585,9 @@ namespace Calculator
                         break;
                     case Keys.Divide:
                         ParseButton("/");
+                        break;
+                    case Keys.Decimal:
+                        AddNumber(".");
                         break;
                     case Keys.Delete:
                     case Keys.Back:
