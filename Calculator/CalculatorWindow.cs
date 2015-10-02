@@ -9,7 +9,6 @@ using System.Text;
 using System.Windows.Forms;
 using System.IO;
 using System.Threading;
-using System.Globalization;
 
 namespace Calculator
 {
@@ -42,8 +41,6 @@ namespace Calculator
             // Function operators
             AddOperationToken("pow2", 5, true);
             AddOperationToken("√", 5, true);
-
-            Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("en-GB");
 
             InitializeComponent();
         }
@@ -591,7 +588,7 @@ namespace Calculator
                         ParseButton("/");
                         break;
                     case Keys.Decimal:
-                        AddNumber(".");
+                        AddNumber(Thread.CurrentThread.CurrentCulture.NumberFormat.NumberDecimalSeparator);
                         break;
                     case Keys.Delete:
                     case Keys.Back:
