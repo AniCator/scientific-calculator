@@ -14,7 +14,7 @@ namespace Calculator
     struct OperatorPrecedenceInfo
     {
         public string Token;
-        public string Precedence;
+        public int Precedence;
         public bool Associative;
     }
 
@@ -31,20 +31,20 @@ namespace Calculator
         public CalculatorWindow()
         {
             // Standard operators
-            AddOperationToken("+", "2", false);
-            AddOperationToken("-", "2", false);
-            AddOperationToken("/", "3", false);
-            AddOperationToken("*", "3", false);
-            AddOperationToken("^", "4", true);
+            AddOperationToken("+", 2, false);
+            AddOperationToken("-", 2, false);
+            AddOperationToken("/", 3, false);
+            AddOperationToken("*", 3, false);
+            AddOperationToken("^", 4, true);
 
             // Function operators
-            AddOperationToken("pow2", "5", true);
-            AddOperationToken("√", "5", true);
+            AddOperationToken("pow2", 5, true);
+            AddOperationToken("√", 5, true);
 
             InitializeComponent();
         }
 
-        private void AddOperationToken(string inToken, string inPrecedence, bool inAssociative)
+        private void AddOperationToken(string inToken, int inPrecedence, bool inAssociative)
         {
             OperatorPrecedenceInfo data;
             data.Token = inToken;
@@ -96,11 +96,11 @@ namespace Calculator
             {
                 if (op.Token == token1)
                 {
-                    prec1 = int.Parse(op.Precedence);
+                    prec1 = op.Precedence;
                 }
                 if (op.Token == token2)
                 {
-                    prec2 = int.Parse(op.Precedence);
+                    prec2 = op.Precedence;
                 }
             }
 
