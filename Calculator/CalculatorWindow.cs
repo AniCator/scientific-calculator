@@ -26,8 +26,15 @@ namespace Calculator
         private string m_InputString = "0";
         private string m_InfixString = "";
         private double m_Memory = 0.0;
+        private double m_PreviousResult = 0.0;
 
         private Stack<string> m_PolishStack = new Stack<string>();
+
+        bool m_bCopyCalc = false;
+        bool m_bFinishedCalculation = false;
+        bool m_bHoldingOperator = false;
+        bool m_bDecimalEntered = false;
+        string m_sHeldOperator = "";
 
         public CalculatorWindow()
         {
@@ -41,7 +48,7 @@ namespace Calculator
             // Function operators
             AddOperationToken("pow2", 5, true);
             AddOperationToken("√", 5, true);
-
+             
             InitializeComponent();
         }
 
@@ -193,7 +200,7 @@ namespace Calculator
             return false;
         }
 
-        private void CalculateAnswer()
+        private double CalculateAnswer()
         {
             //if (m_PolishStack.Count <= 1) return;
 
@@ -239,11 +246,12 @@ namespace Calculator
             ResetInputString();
             BuildCalculationString();
 
+            double result = 0.0;
             if (resultExpression != null)
             {
                 string resultString = "Infinity?";
                 try {
-                    double result = resultExpression.Interpret();
+                    result = resultExpression.Interpret();
                     resultString = result.ToString();
                 }
                 catch(NullReferenceException exception)
@@ -259,6 +267,8 @@ namespace Calculator
                 //ClearCalculations();
                 Console.WriteLine("Error: resultExpression is a 'null' object");
             }
+
+            return result;
         }
 
         private void ClearCalculations()
@@ -315,6 +325,13 @@ namespace Calculator
 
             bool bOperatorInput = IsOperator(polishString);
 
+            if (m_bFinishedCalculation)
+            {
+                ClearCalculations();
+                m_bFinishedCalculation = false;
+                m_InfixString += m_PreviousResult.ToString() + " ";
+            }
+
             if (!(bOperatorInput && m_bHoldingOperator && (m_sHeldOperator != "(" || m_sHeldOperator != ")")))
             {
                 if (polishString != "=" && polishString != "")
@@ -370,7 +387,13 @@ namespace Calculator
             m_bHoldingOperator = bOperatorInput;
 
             UpdateResultLabel();
-            CalculateAnswer();
+
+            double result = CalculateAnswer();
+
+            if(m_bFinishedCalculation)
+            {
+                m_PreviousResult = result;
+            }
         }
 
         private void ClearEntry()
@@ -418,11 +441,6 @@ namespace Calculator
             ClearEntry();
         }
 
-        bool m_bCopyCalc = false;
-        bool m_bFinishedCalculation = false;
-        bool m_bHoldingOperator = false;
-        bool m_bDecimalEntered = false;
-        string m_sHeldOperator = "";
         private void buttonParseAndAddCalculation_Click(object sender, EventArgs e)
         {
             Button inputButton = (Button)sender;
@@ -602,7 +620,7 @@ namespace Calculator
 
         protected override bool ProcessDialogKey(Keys keyData)
         {
-            if (((keyData & Keys.Enter) == Keys.Enter) && (this.ContainsFocus))
+            if ((keyData == Keys.Enter) && (this.ContainsFocus))
             {
                 ParseButton("=");
                 return false;
